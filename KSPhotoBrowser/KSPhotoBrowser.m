@@ -79,8 +79,6 @@ static Class ImageManagerClass = nil;
         _enableTransitionAnimation = YES;
         /// 允许单击Dismiss
         _allowsSingleTapToDismiss = YES;
-        /// 开启拖拽手势拖拽
-        _enableDrag = YES;
         /// 允许拖拽Dismiss, 如果No, 会恢复手势开始位置
         _allowsDragToDismiss = YES;
     }
@@ -644,8 +642,6 @@ static Class ImageManagerClass = nil;
 }
 
 - (void)didPan:(UIPanGestureRecognizer *)pan {
-    
-    if (!self.enableDrag) return;
     
     KSPhotoView *photoView = [self photoViewForPage:_currentPage];
     if (photoView.zoomScale > 1.1) {

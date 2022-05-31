@@ -15,9 +15,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, KSPhotoBrowserInteractiveDismissalStyle) {
+    /// 旋转
     KSPhotoBrowserInteractiveDismissalStyleRotation,
+    /// 缩放
     KSPhotoBrowserInteractiveDismissalStyleScale,
+    /// 滑动
     KSPhotoBrowserInteractiveDismissalStyleSlide,
+    /// 禁用
     KSPhotoBrowserInteractiveDismissalStyleNone
 };
 
@@ -59,8 +63,6 @@ typedef NS_ENUM(NSUInteger, KSPhotoBrowserImageLoadingStyle) {
 @property (nonatomic, assign) BOOL allowsSingleTapToDismiss;
 /// 允许拖拽Dismiss, 如果No, 会恢复手势开始位置
 @property (nonatomic, assign) BOOL allowsDragToDismiss;
-/// 开启拖拽手势拖拽
-@property (nonatomic, assign) BOOL enableDrag;
 
 + (instancetype)browserWithPhotoItems:(NSArray<KSPhotoItem *> *)photoItems selectedIndex:(NSUInteger)selectedIndex;
 - (instancetype)initWithPhotoItems:(NSArray<KSPhotoItem *> *)photoItems selectedIndex:(NSUInteger)selectedIndex;
