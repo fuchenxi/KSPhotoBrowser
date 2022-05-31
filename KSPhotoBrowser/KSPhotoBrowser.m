@@ -74,6 +74,15 @@ static Class ImageManagerClass = nil;
         if (ImageManagerClass == nil) {
             ImageManagerClass = KSSDImageManager.class;
         }
+        
+        /// 开启转场动画
+        _enableTransitionAnimation = YES;
+        /// 允许单击Dismiss
+        _allowsSingleTapToDismiss = YES;
+        /// 开启拖拽手势拖拽
+        _enableDrag = YES;
+        /// 允许拖拽Dismiss, 如果No, 会恢复手势开始位置
+        _allowsDragToDismiss = YES;
     }
     return self;
 }
@@ -81,8 +90,8 @@ static Class ImageManagerClass = nil;
 // MARK: - Life Cycle
 
 - (void)viewDidLoad {
+    
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
     
     self.view.backgroundColor = [UIColor clearColor];
     
@@ -141,11 +150,9 @@ static Class ImageManagerClass = nil;
         [self blurBackgroundWithImage:item.thumbImage animated:NO];
     }
     
-    if (self.userPushJump) {
-        
+    if (!self.enableTransitionAnimation) {
         [self configPhotoView:photoView withItem:item];
         self.presented = YES;
-//        [self setStatusBarHidden:YES];
         return;
     }
     
@@ -394,11 +401,7 @@ static Class ImageManagerClass = nil;
     } else {
         item.sourceView.alpha = 1;
     }
-    if (self.userPushJump) {
-        [self.navigationController popViewControllerAnimated:YES];
-    } else {
-        [self dismissViewControllerAnimated:NO completion:nil];
-    }
+    [self dismissViewControllerAnimated:NO completion:nil];
 }
 
 - (void)performRotationWithPan:(UIPanGestureRecognizer *)pan {
@@ -431,7 +434,10 @@ static Class ImageManagerClass = nil;
             break;
         case UIGestureRecognizerStateEnded:
         case UIGestureRecognizerStateCancelled: {
-            if (fabs(point.y) > 200 || fabs(velocity.y) > 500) {
+            
+            if (!self.allowsDragToDismiss) {
+                [self showCancellationAnimation];
+            } else if (fabs(point.y) > 200 || fabs(velocity.y) > 500) {
                 [self showRotationCompletionAnimationFromPoint:point velocity:velocity];
             } else {
                 [self showCancellationAnimation];
@@ -477,7 +483,9 @@ static Class ImageManagerClass = nil;
             break;
         case UIGestureRecognizerStateEnded:
         case UIGestureRecognizerStateCancelled: {
-            if (fabs(point.y) > 100 || fabs(velocity.y) > 500) {
+            if (!self.allowsDragToDismiss) {
+                [self showCancellationAnimation];
+            } else if (fabs(point.y) > 100 || fabs(velocity.y) > 500) {
                 [self showDismissalAnimation];
             } else {
                 [self showCancellationAnimation];
@@ -509,7 +517,9 @@ static Class ImageManagerClass = nil;
             break;
         case UIGestureRecognizerStateEnded:
         case UIGestureRecognizerStateCancelled: {
-            if (fabs(point.y) > 200 || fabs(velocity.y) > 500) {
+            if (!self.allowsDragToDismiss) {
+                [self showCancellationAnimation];
+            } else if (fabs(point.y) > 200 || fabs(velocity.y) > 500) {
                 [self showSlideCompletionAnimationFromPoint:point velocity:velocity];
             } else {
                 [self showCancellationAnimation];
@@ -583,14 +593,15 @@ static Class ImageManagerClass = nil;
     UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didLongPress:)];
     [self.view addGestureRecognizer:longPress];
     
-    if (!self.userPushJump) {
-        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(didPan:)];
-        [self.view addGestureRecognizer:pan];
-    }
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(didPan:)];
+    [self.view addGestureRecognizer:pan];
 }
 
 - (void)didSingleTap:(UITapGestureRecognizer *)tap {
-    [self showDismissalAnimation];
+    
+    if (self.allowsSingleTapToDismiss) {
+        [self showDismissalAnimation];
+    }
 }
 
 - (void)didDoubleTap:(UITapGestureRecognizer *)tap {
@@ -633,6 +644,9 @@ static Class ImageManagerClass = nil;
 }
 
 - (void)didPan:(UIPanGestureRecognizer *)pan {
+    
+    if (!self.enableDrag) return;
+    
     KSPhotoView *photoView = [self photoViewForPage:_currentPage];
     if (photoView.zoomScale > 1.1) {
         return;
@@ -748,7 +762,7 @@ static Class ImageManagerClass = nil;
     [self setStatusBarHidden:NO];
     
     
-    if (self.userPushJump) {
+    if (!self.enableTransitionAnimation) {
         [self dismissAnimated:NO];
         return;
     }

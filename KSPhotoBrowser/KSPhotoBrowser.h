@@ -52,7 +52,15 @@ typedef NS_ENUM(NSUInteger, KSPhotoBrowserImageLoadingStyle) {
 @property (nonatomic, weak) id<KSPhotoBrowserDelegate> delegate;
 @property (class, nonatomic, strong) Class<KSImageManager> imageManagerClass;
 @property (class, nonatomic, strong) UIColor *imageViewBackgroundColor;
-@property (nonatomic, assign) BOOL userPushJump;
+
+/// 开启转场动画
+@property (nonatomic, assign) BOOL enableTransitionAnimation;
+/// 允许单击Dismiss
+@property (nonatomic, assign) BOOL allowsSingleTapToDismiss;
+/// 允许拖拽Dismiss, 如果No, 会恢复手势开始位置
+@property (nonatomic, assign) BOOL allowsDragToDismiss;
+/// 开启拖拽手势拖拽
+@property (nonatomic, assign) BOOL enableDrag;
 
 + (instancetype)browserWithPhotoItems:(NSArray<KSPhotoItem *> *)photoItems selectedIndex:(NSUInteger)selectedIndex;
 - (instancetype)initWithPhotoItems:(NSArray<KSPhotoItem *> *)photoItems selectedIndex:(NSUInteger)selectedIndex;
